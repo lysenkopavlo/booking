@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/lysenkopavlo/booking/config"
+	"github.com/lysenkopavlo/booking/pkg/config"
 	"github.com/lysenkopavlo/booking/pkg/handler"
 	"github.com/lysenkopavlo/booking/pkg/render"
 )
