@@ -6,8 +6,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/lysenkopavlo/booking/models"
 	"github.com/lysenkopavlo/booking/pkg/config"
+	"github.com/lysenkopavlo/booking/pkg/models"
 	"github.com/lysenkopavlo/booking/pkg/render"
 )
 

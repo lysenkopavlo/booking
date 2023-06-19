@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/lysenkopavlo/booking/models"
 	"github.com/lysenkopavlo/booking/pkg/config"
+	"github.com/lysenkopavlo/booking/pkg/models"
 )
 
 var app *config.AppConfig
