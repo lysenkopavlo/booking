@@ -11,20 +11,22 @@ import (
 	"github.com/lysenkopavlo/booking/pkg/render"
 )
 
-// TemplateData holds data sent from handlers to templates
-
+// Repo the repository used by handlers
 var Repo *Repository
 
+// Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
 }
 
+// NewRepo creates a new repository
 func NewRepo(a *config.AppConfig) *Repository {
 	return &Repository{
 		App: a,
 	}
 }
 
+// NewHandlers sets the repository for the handlers
 func NewHandler(r *Repository) {
 	Repo = r
 }
@@ -49,4 +51,31 @@ func (rp *Repository) About(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{
 		StringMap: stringMap,
 	})
+}
+
+// Reservation renders the make reservation page and displays a form
+func (rp *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
+
+	render.RenderTemplate(w, "make-reservation.page.tmpl", &models.TemplateData{})
+}
+
+// Generals renders page for General's quarters room
+func (rp *Repository) Generals(w http.ResponseWriter, r *http.Request) {
+
+	render.RenderTemplate(w, "generals.page.tmpl", &models.TemplateData{})
+}
+
+// Majors renders page for Major's suite room
+func (rp *Repository) Majors(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "majors.page.tmpl", &models.TemplateData{})
+}
+
+// Availability renders page for Major's suite room
+func (rp *Repository) Availability(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "search-availability.page.tmpl", &models.TemplateData{})
+}
+
+// Contact renders the contact page
+func (rp *Repository) Contacts(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "contacts.page.tmpl", &models.TemplateData{})
 }

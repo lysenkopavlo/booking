@@ -15,7 +15,7 @@
 		href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.3/dist/css/datepicker-bs5.min.css">
 	<link rel="stylesheet" type="text/css" href="https://unpkg.com/notie/dist/notie.min.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
-	<link rel="stylesheet" href="/static/css/style/style.css">
+	<link rel="stylesheet" type="text/css"  href="/static/css/style/style.css">
 
 </head>
 
@@ -37,24 +37,24 @@
 					<div class="collapse navbar-collapse" id="navbarSupportedContent">
 						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 							<li class="nav-item">
-								<a class="nav-link active" aria-current="page" href="index.html">Home</a>
+								<a class="nav-link active" aria-current="page" href="/">Home</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="about.html">About</a>
+								<a class="nav-link" href="/about">About</a>
 							</li>
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
 									aria-expanded="false">Rooms</a>
 								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href="generals.html">General's Quarters</a></li>
-									<li><a class="dropdown-item" href="majors.html">Major's Suite</a></li>
+									<li><a class="dropdown-item" href="/generals-quarters">General's Quarters</a></li>
+									<li><a class="dropdown-item" href="/majors-suite">Major's Suite</a></li>
 								</ul>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="reservation.html">Book now</a>
+								<a class="nav-link" href="/search-availability">Book now</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="contacts.html">Contacts</a>
+								<a class="nav-link" href="/contacts">Contacts</a>
 							</li>
 						</ul>
 					</div>
@@ -68,8 +68,6 @@
 
         {{end}}
     </div>
-
-
 
 <!-- Testing footer	 -->
 	<div class="row my-footer">
@@ -120,33 +118,6 @@
 				}, false);
 			});
 		})();
-
-		//	Listens if button is clicked and pops out a message if it does
-		document.getElementById("colorButton").addEventListener("click", function () {
-			let html = `
-			<form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
-      			<div class="d-flex flex-row justify-content-evenly" id="reservation-dates-modal">
-        			<div class="p-2">
-          				<input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival">
-        			</div>
-        			<div class="p-2">
-          				<input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure">
-        			</div>
-      			</div>
-    		</form>
-			`;
-			attention.custom({
-				title: "Choose your dates",
-				msg: html,
-			});
-		})
-
-		//for date picker:
-		const elem = document.getElementById('reservation-dates');
-		const rangePicker = new DateRangePicker(elem, {
-			format: "yyyy-mm-dd",
-		});
-
 
 		// Depricated since we are using sweet alert 2
 		function notify(msg, msgType) {

@@ -2,19 +2,34 @@
 
 {{define "content"}}
     <div class="container">
-        <div class="row">
-            <div class="col">
-                <h1>This is the about page</h1>
-                <p>Some text about about page</p> 
-                <p>This came from the {{index .StringMap "test"}}</p>
-                <p>
-                    {{if ne (index .StringMap "remote_ip") ""}}
-                    Your remote IP address is {{index .StringMap "remote_ip"}}
-                    {{else}}
-                    I don't know your IP Address yet, visit home page.
-                    {{end}} 
-                </p>
-            </div>
-        </div>
-    </div>
+		<div class="row">
+			<div class="col">
+				<h1>Make reservation</h1>
+				<form action="" method="post" class="needs-validation" novalidate>
+					<div class="form-group mt-5">
+						<label for="first_name" class="form-control">First name</label>
+						<input type="text" name="first_name" id="first_name" required autocomplete="off">
+					</div>
+					<div class="form-group">
+						<label for="last_name" class="form-control">Last name</label>
+						<input type="text" name="last_name" id="last_name" required autocomplete="off">
+					</div>
+					<div class="form-group">
+						<label for="email" class="form-control">First name</label>
+						<input type="email" name="email" id="email" required autocomplete="off">
+					</div>
+					<div class="form-group">
+						<label for="phone" class="form-control">First name</label>
+						<input type="text" name="phone" id="phone" required autocomplete="off">
+					</div>
+					<hr>
+					<div>
+						<button type="submit" class="btn btn-primary">Make reservation</button>
+					</div>
+					</hr>
+				</form>
+			</div>
+		</div>
+	</div>
+
 {{end}}

@@ -1,5 +1,54 @@
 {{template "base" .}}
 
 {{define "content"}}
+<!-- The picture for General's quarters -->
+<div class="container">
+    <div class="row"> 
+        <div class="col">
+            <img src="/static/images/generals-quarters.png"
+            class="image-fluid img-thumbnail rounded mx-auto d-block room-image" alt="room image">
+        </div>
+    </div> 
+</div>
+<!--bottom placing-->
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center me-3">This is General's Quarters, son!<h1>
+        </div>
+    </div>
+</div>
+<!--button placing-->
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <a id="check-availability-button" href="#!" class="btn btn-success">Check Avialiability</a>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "js"}}
+<script>
+    document.getElementById("check-availability-button").addEventListener("click", function () {
+        let html = `
+            <form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
+                <div class="d-flex flex-row justify-content-evenly" id="reservation-dates-modal">
+                    <div class="p-2">
+                        <input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival">
+                    </div>
+                    <div class="p-2">
+                        <input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure">
+                    </div>
+                </div>
+            </form>
+            `;
+        attention.custom({
+            title: "Choose your dates",
+            msg: html,
+        });
+    })
+
+</script>
 
 {{end}}
