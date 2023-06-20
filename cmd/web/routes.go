@@ -9,21 +9,23 @@ import (
 	"github.com/lysenkopavlo/booking/pkg/handler"
 )
 
-func routes(a *config.AppConfig) http.Handler {
+func routes(app *config.AppConfig) http.Handler {
 	// Creating a multiplexer
 	mux := chi.NewRouter()
 	// Testing middleware of this package
 	mux.Use(middleware.Recoverer)
 
-	mux.Use(WriteToConsole)
+	//mux.Use(WriteToConsole)
 	mux.Use(NoSurf)
 	mux.Use(SessionLoad)
+
 	mux.Get("/", handler.Repo.Home)
 	mux.Get("/about", handler.Repo.About)
 	mux.Get("/generals-quarters", handler.Repo.Generals)
 	mux.Get("/majors-suite", handler.Repo.Majors)
 	mux.Get("/search-availability", handler.Repo.Availability)
 	mux.Get("/contacts", handler.Repo.Contacts)
+	mux.Get("/make-reservation", handler.Repo.Reservation)
 
 	// Telling to app where are the files
 	fileServer := http.FileServer(http.Dir("./static/"))

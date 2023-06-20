@@ -4,29 +4,38 @@
     <div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Make reservation</h1>
+				<h1 class="mt-3">Make reservation</h1>
+
 				<form action="" method="post" class="needs-validation" novalidate>
-					<div class="form-group mt-5">
-						<label for="first_name" class="form-control">First name</label>
-						<input type="text" name="first_name" id="first_name" required autocomplete="off">
+
+					<div class="form-group-ms">
+						<label for="first_name" >First name:</label>
+						<input class="form-control" 
+						type="text" name="first_name" id="first_name"  autocomplete="off" 
+						value="" required>
 					</div>
 					<div class="form-group">
-						<label for="last_name" class="form-control">Last name</label>
-						<input type="text" name="last_name" id="last_name" required autocomplete="off">
+						<label for="last_name" >Last name:</label>
+						<input class="form-control" 
+						type="text" name="last_name" id="last_name" autocomplete="off" 
+						value="" required>
 					</div>
 					<div class="form-group">
-						<label for="email" class="form-control">First name</label>
-						<input type="email" name="email" id="email" required autocomplete="off">
+						<label for="email" >Email:</label>
+						<input class="form-control" 
+						type="email" name="email" id="email" autocomplete="off" 
+						value="" required>
 					</div>
 					<div class="form-group">
-						<label for="phone" class="form-control">First name</label>
-						<input type="text" name="phone" id="phone" required autocomplete="off">
+						<label for="phone" >Phone number:</label>
+						<input class="form-control" 
+						type="text" name="phone" id="phone" autocomplete="off" 
+						value="" required>
 					</div>
+					
 					<hr>
-					<div>
-						<button type="submit" class="btn btn-primary">Make reservation</button>
-					</div>
-					</hr>
+					<input type="submit" class="btn btn-primary" value="Make Reservation">	
+					
 				</form>
 			</div>
 		</div>
