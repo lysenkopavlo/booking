@@ -9,9 +9,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/lysenkopavlo/booking/pkg/config"
-	"github.com/lysenkopavlo/booking/pkg/models"
-	"github.com/lysenkopavlo/booking/pkg/render"
+	"github.com/lysenkopavlo/booking/internal/config"
+	"github.com/lysenkopavlo/booking/internal/models"
+	"github.com/lysenkopavlo/booking/internal/render"
 )
 
 // Repo the repository used by handlers

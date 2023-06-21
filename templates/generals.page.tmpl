@@ -3,12 +3,12 @@
 {{define "content"}}
 <!-- The picture for General's quarters -->
 <div class="container">
-    <div class="row"> 
+    <div class="row">
         <div class="col">
             <img src="/static/images/generals-quarters.png"
-            class="image-fluid img-thumbnail rounded mx-auto d-block room-image" alt="room image">
+                class="image-fluid img-thumbnail rounded mx-auto d-block room-image" alt="room image">
         </div>
-    </div> 
+    </div>
 </div>
 <!--bottom placing-->
 <div class="container">
@@ -30,7 +30,7 @@
 
 {{define "js"}}
 <script>
-    
+
     document.getElementById("check-availability-button").addEventListener("click", function () {
         let html = `
             <form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
@@ -47,6 +47,34 @@
         attention.custom({
             title: "Choose your dates",
             msg: html,
+            willOpen: () => {
+                const elem = document.getElementById("reservation-dates-modal");
+                const rp = new DateRangePicker(elem, {
+                    format: 'yyyy-mm-dd',
+                    showOnFocus: false,
+                    orientation: "top",
+                });
+            },
+            didOpen: () => {
+                document.getElementById("start").removeAttribute("disabled");
+                document.getElementById("end").removeAttribute("disabled");
+            },
+
+            callback: async function (result) {
+                let form = document.getElementById("check-availability-form");
+                let formData = new FormData(form);
+                formData.append("csrf_token", "{{.CSRFToken}}");
+
+                const response = await fetch('/search-availability-json', {
+                    method: "post",
+                    body: formData,
+
+                });
+                const data = await response.json();
+                console.log(data);
+                console.log(data.ok);
+                console.log(data.message);
+            },
         });
     })
 

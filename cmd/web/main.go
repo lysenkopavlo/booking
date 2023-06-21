@@ -8,9 +8,9 @@ import (
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/lysenkopavlo/booking/pkg/config"
-	"github.com/lysenkopavlo/booking/pkg/handler"
-	"github.com/lysenkopavlo/booking/pkg/render"
+	"github.com/lysenkopavlo/booking/internal/config"
+	"github.com/lysenkopavlo/booking/internal/handler"
+	"github.com/lysenkopavlo/booking/internal/render"
 )
 
 const portNumber = ":8080"
