@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/lysenkopavlo/booking/internal/config"
 	"github.com/lysenkopavlo/booking/internal/handler"
+	"github.com/lysenkopavlo/booking/internal/models"
 	"github.com/lysenkopavlo/booking/internal/render"
 )
 
@@ -21,6 +23,11 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
+	// what am igoing to put in the session
+	gob.Register(models.Reservation{})
+
+	// change this to true when in production
+	app.InProduction = false
 
 	// Session is a variable to set user's session parameters
 	session = scs.New()
@@ -28,10 +35,10 @@ func main() {
 	// setting lifetime for session
 	session.Lifetime = 24 * time.Hour
 
-	// Is cockie persisting after closing a browser?
+	// is cockie persisting after closing a browser?
 	session.Cookie.Persist = true // means don't want to clear cockie after closing browser
 
-	//How restrict do you want to be about coockie?
+	// how restrict do you want to be about coockie?
 	session.Cookie.SameSite = http.SameSiteLaxMode
 
 	// insisting about coockie incryption

@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/lysenkopavlo/booking/internal/config"
+	"github.com/lysenkopavlo/booking/internal/forms"
 	"github.com/lysenkopavlo/booking/internal/models"
 	"github.com/lysenkopavlo/booking/internal/render"
 )
@@ -58,8 +59,51 @@ func (rp *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 // Reservation renders the make reservation page and displays a form
 func (rp *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
+	var emptyReservation models.Reservation
+	data := make(map[string]interface{})
+	data["reservation"] = emptyReservation
 
-	render.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
+		Data: data,
+	})
+}
+
+// PostReservation handels the posting of a reservation form
+func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	reservation := models.Reservation{
+		FirstName: r.Form.Get("first_name"),
+		LastName:  r.Form.Get("last_name"),
+		Email:     r.Form.Get("email"),
+		Phone:     r.Form.Get("phone"),
+	}
+
+	form := forms.New(r.PostForm)
+	//	form.Has("first_name", r)
+	form.Required("first_name", "last_name", "email")
+	form.MinLength("first_name", 3, r)
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		data := make(map[string]interface{})
+		data["reservation"] = reservation
+
+		render.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+		return
+	}
+
+	// Putting user's values into contex
+	rp.App.Session.Put(r.Context(), "reservation", reservation)
+	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }
 
 // Generals renders page for General's quarters room
@@ -110,4 +154,20 @@ func (rp *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 // Contact renders the contact page
 func (rp *Repository) Contacts(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "contacts.page.tmpl", &models.TemplateData{})
+}
+
+func (rp *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
+	reservation, ok := rp.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		log.Println("Aint getin' nothing from session")
+		rp.App.Session.Put(r.Context(), "error", "Aint doin nophen")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+	rp.App.Session.Remove(r.Context(), "reservation")
+	data := make(map[string]interface{})
+	data["reservation"] = reservation
+	render.RenderTemplate(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
 }

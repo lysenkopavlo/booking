@@ -135,6 +135,18 @@
 				confirmButtonText: confirmButtonText
 			})
 		}
+		// display an error message if 
+		{{with .Error}}
+		notify("{{.}}", "error");
+		{{end}}
+		
+		{{with .Flash}}
+		notify("{{.}}", "flash");
+		{{end}}
+
+		{{with .Warning}}
+		notify("{{.}}", "warning");
+		{{end}}
 
 		// Promt is a function for making attention messages
 		function Promt() {
