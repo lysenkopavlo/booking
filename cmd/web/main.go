@@ -57,7 +57,7 @@ func run() error {
 	// how restrict do you want to be about coockie?
 	session.Cookie.SameSite = http.SameSiteLaxMode
 
-	// insisting about coockie incryption
+	// here we are insisting about coockie incryption
 	session.Cookie.Secure = app.InProduction // for now
 
 	tc, err := render.CreateTemplateCache()

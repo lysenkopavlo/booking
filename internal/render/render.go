@@ -2,6 +2,7 @@ package render
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -22,6 +23,8 @@ var pathTemplates = "./templates"
 func NewTemplate(a *config.AppConfig) {
 	app = a
 }
+
+// AddData adds default values into template
 func AddData(td *models.TemplateData, r *http.Request) *models.TemplateData {
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Error = app.Session.PopString(r.Context(), "error")
@@ -32,7 +35,7 @@ func AddData(td *models.TemplateData, r *http.Request) *models.TemplateData {
 }
 
 // RenderTemplate renders a template
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	// retrive template from app config
 	//throu linking via pointers
 	var tc map[string]*template.Template
@@ -45,7 +48,8 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	// get requested template from cache
 	t, ok := tc[tmpl]
 	if !ok {
-		log.Println("There is not a template")
+		log.Println("Can't get a template from cache")
+		return errors.New("can't get a template from cache")
 	}
 
 	buf := new(bytes.Buffer)
@@ -53,6 +57,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
 
 	// render the template
@@ -60,8 +65,11 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	if err != nil {
 		log.Println(err)
 	}
+
+	return nil
 }
 
+// CreateTemplateCache creates a cached template
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := make(map[string]*template.Template)
 

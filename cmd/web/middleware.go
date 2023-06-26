@@ -7,6 +7,8 @@ import (
 	"github.com/justinas/nosurf"
 )
 
+// WriteToConsole indicates working middleware
+// by printing hello in console
 func WriteToConsole(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		fmt.Println("Hello from middleware.go")
@@ -27,7 +29,7 @@ func NoSurf(next http.Handler) http.Handler {
 	return csrfHandler
 }
 
-// SessionLoads loads and saves the session on every request
+// SessionLoad loads and saves the session on every request
 func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
 }
