@@ -159,8 +159,8 @@ func (rp *Repository) Contacts(w http.ResponseWriter, r *http.Request) {
 func (rp *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := rp.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		log.Println("Aint getin' nothing from session")
-		rp.App.Session.Put(r.Context(), "error", "Aint doin nophen")
+		log.Println("can't get item from session")
+		rp.App.Session.Put(r.Context(), "error", "can't get item from session")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}

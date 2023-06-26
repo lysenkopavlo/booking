@@ -64,7 +64,9 @@ func getRoutes() http.Handler {
 	mux.Use(middleware.Recoverer)
 
 	// mux.Use(WriteToConsole)
-	mux.Use(NoSurf)
+
+	// turning off(comment out) CSRF token for tests
+	// mux.Use(NoSurf)
 	mux.Use(SessionLoad)
 
 	mux.Get("/", Repo.Home)
