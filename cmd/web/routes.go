@@ -12,11 +12,13 @@ import (
 func routes(app *config.AppConfig) http.Handler {
 	// Creating a multiplexer
 	mux := chi.NewRouter()
+
 	// Testing middleware of this package
 	mux.Use(middleware.Recoverer)
 
-	//mux.Use(WriteToConsole)
+	//NoSurf for CSRF Token
 	mux.Use(NoSurf)
+
 	mux.Use(SessionLoad)
 
 	mux.Get("/", handler.Repo.Home)
