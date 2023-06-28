@@ -2,9 +2,9 @@ package forms
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -15,7 +15,7 @@ type Form struct {
 	Errors errors
 }
 
-// New initilaizes a form struct
+// New initilaizes a Form struct with data field
 func New(data url.Values) *Form {
 	return &Form{
 		data,
@@ -41,9 +41,9 @@ func (f *Form) Required(fields ...string) {
 }
 
 // MinLength check for minimum length
-func (f *Form) MinLength(field string, lenght int, r *http.Request) bool {
-	x := r.Form.Get(field)
-	if len(x) < lenght {
+func (f *Form) MinLength(field string, lenght int) bool {
+	x := f.Get(field)
+	if utf8.RuneCountInString(x)-1 < lenght {
 		f.Errors.Add(field, fmt.Sprintf("This field must be at least %d characters long", lenght))
 		return false
 	}
@@ -59,8 +59,8 @@ func (f *Form) IsEmail(field string) bool {
 }
 
 // Has checks if form field is in post and not empty
-func (f *Form) Has(field string, r *http.Request) bool {
-	x := r.Form.Get(field)
+func (f *Form) Has(field string) bool {
+	x := f.Get(field)
 	if x == "" {
 		f.Errors.Add(field, "This field cannot be blank")
 		return false

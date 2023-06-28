@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/lysenkopavlo/booking/internal/config"
 	"github.com/lysenkopavlo/booking/internal/handler"
+	"github.com/lysenkopavlo/booking/internal/helpers"
 	"github.com/lysenkopavlo/booking/internal/models"
 	"github.com/lysenkopavlo/booking/internal/render"
 )
@@ -45,6 +47,12 @@ func run() error {
 	// change this to true when in production
 	app.InProduction = false
 
+	infoLogger := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLogger
+
+	errorLogger := log.New(os.Stdout, "Error\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLogger
+
 	// Session is a variable to set user's session parameters
 	session = scs.New()
 
@@ -68,9 +76,12 @@ func run() error {
 	app.TemplateCache = tc
 	app.UseCache = false
 	app.Session = session
+
 	render.NewTemplate(&app)
 
 	repo := handler.NewRepo(&app)
+
+	helpers.NewHelpers(&app)
 
 	handler.NewHandler(repo)
 
