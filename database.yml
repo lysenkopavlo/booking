@@ -2,7 +2,7 @@ development:
   dialect: postgres
   database: bookings
   user: pablo
-  password: 
+  password: password
   host: 127.0.0.1
   pool: 5
 
