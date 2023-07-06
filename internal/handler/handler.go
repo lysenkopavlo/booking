@@ -47,7 +47,7 @@ func (rp *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	remoteIP := r.RemoteAddr
 	rp.App.Session.Put(r.Context(), "remote_ip", remoteIP)
 
-	err := render.RenderTemplate(w, r, "home.page.tmpl", &models.TemplateData{})
+	err := render.Template(w, r, "home.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -63,7 +63,7 @@ func (rp *Repository) About(w http.ResponseWriter, r *http.Request) {
 	remoteIP := rp.App.Session.GetString(r.Context(), "remote_ip")
 	stringMap["remote_ip"] = remoteIP
 
-	err := render.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{})
+	err := render.Template(w, r, "about.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -76,7 +76,7 @@ func (rp *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["reservation"] = emptyReservation
 
-	err := render.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+	err := render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
 		Form: forms.New(nil),
 		Data: data,
 	})
@@ -112,7 +112,7 @@ func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 
-		render.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+		render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
@@ -127,7 +127,7 @@ func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 // Generals renders page for General's quarters room
 func (rp *Repository) Generals(w http.ResponseWriter, r *http.Request) {
 
-	err := render.RenderTemplate(w, r, "generals.page.tmpl", &models.TemplateData{})
+	err := render.Template(w, r, "generals.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -136,7 +136,7 @@ func (rp *Repository) Generals(w http.ResponseWriter, r *http.Request) {
 
 // Majors renders page for Major's suite room
 func (rp *Repository) Majors(w http.ResponseWriter, r *http.Request) {
-	err := render.RenderTemplate(w, r, "majors.page.tmpl", &models.TemplateData{})
+	err := render.Template(w, r, "majors.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -145,7 +145,7 @@ func (rp *Repository) Majors(w http.ResponseWriter, r *http.Request) {
 
 // Availability renders page for search page
 func (rp *Repository) Availability(w http.ResponseWriter, r *http.Request) {
-	err := render.RenderTemplate(w, r, "search-availability.page.tmpl", &models.TemplateData{})
+	err := render.Template(w, r, "search-availability.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -192,7 +192,7 @@ func (rp *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
 // Contact renders the contact page
 func (rp *Repository) Contacts(w http.ResponseWriter, r *http.Request) {
-	err := render.RenderTemplate(w, r, "contacts.page.tmpl", &models.TemplateData{})
+	err := render.Template(w, r, "contacts.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -210,7 +210,7 @@ func (rp *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request)
 	rp.App.Session.Remove(r.Context(), "reservation")
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
-	err := render.RenderTemplate(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
+	err := render.Template(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
 	if err != nil {

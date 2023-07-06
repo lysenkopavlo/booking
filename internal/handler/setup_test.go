@@ -44,13 +44,13 @@ func getRoutes() http.Handler {
 	// setting lifetime for session
 	session.Lifetime = 24 * time.Hour
 
-	// is cockie persisting after closing a browser?
-	session.Cookie.Persist = true // means don't want to clear cockie after closing browser
+	// is cookie persisting after closing a browser?
+	session.Cookie.Persist = true // means don't want to clear cookie after closing browser
 
-	// how restrict do you want to be about coockie?
+	// how restrict do you want to be about cookie?
 	session.Cookie.SameSite = http.SameSiteLaxMode
 
-	// insisting about coockie incryption
+	// insisting about cookie encryption
 	session.Cookie.Secure = app.InProduction // for now
 
 	tc, err := CreateTestTemplateCache()
@@ -64,7 +64,7 @@ func getRoutes() http.Handler {
 
 	repo := NewRepo(&app)
 	NewHandler(repo)
-	render.NewTemplate(&app)
+	render.NewRenderer(&app)
 	// Creating a multiplexer
 	mux := chi.NewRouter()
 	// Testing middleware of this package
@@ -124,7 +124,7 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 		return myCache, err
 	}
 
-	// range throuh all the pages
+	// range through all the pages
 	for _, page := range pages {
 		name := filepath.Base(page)
 		ts, err := template.New(name).Funcs(functions).ParseFiles(page)

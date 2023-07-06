@@ -20,7 +20,7 @@ var app *config.AppConfig
 var pathTemplates = "./templates"
 
 // NewTemplate sets the config for template package
-func NewTemplate(a *config.AppConfig) {
+func NewRenderer(a *config.AppConfig) {
 	app = a
 }
 
@@ -35,9 +35,9 @@ func AddData(td *models.TemplateData, r *http.Request) *models.TemplateData {
 }
 
 // RenderTemplate renders a template
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
-	// retrive template from app config
-	//throu linking via pointers
+func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
+	// retrieve template from app config
+	// through linking via pointers
 	var tc map[string]*template.Template
 	if app.UseCache {
 		tc = app.TemplateCache
