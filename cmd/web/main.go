@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/gob"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/lysenkopavlo/booking/internal/config"
+	"github.com/lysenkopavlo/booking/internal/driver"
 	"github.com/lysenkopavlo/booking/internal/handler"
 	"github.com/lysenkopavlo/booking/internal/helpers"
 	"github.com/lysenkopavlo/booking/internal/models"
@@ -25,12 +25,14 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
-	err := run()
+
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.SQL.Close()
 
-	fmt.Printf("Starting application on port %s\n", portNumber)
+	log.Printf("Starting application on port %s\n", portNumber)
 
 	srv := &http.Server{
 		Addr:    portNumber,
@@ -40,8 +42,8 @@ func main() {
 	err = srv.ListenAndServe()
 	log.Fatal(err)
 }
-func run() error {
-	// what am igoing to put in the session
+func run() (*driver.DB, error) {
+	// what I'm going to put in the session
 	gob.Register(models.Reservation{})
 
 	// change this to true when in production
@@ -59,31 +61,39 @@ func run() error {
 	// setting lifetime for session
 	session.Lifetime = 24 * time.Hour
 
-	// is cockie persisting after closing a browser?
-	session.Cookie.Persist = true // means don't want to clear cockie after closing browser
+	// is cookie persisting after closing a browser?
+	session.Cookie.Persist = true // means don't want to clear cookie after closing browser
 
-	// how restrict do you want to be about coockie?
+	// how restrict do you want to be about cookie?
 	session.Cookie.SameSite = http.SameSiteLaxMode
 
-	// here we are insisting about coockie incryption
+	// here we are insisting about cookie encryption
 	session.Cookie.Secure = app.InProduction // for now
 
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Println("Can't create a template cache")
-		return err
+		return nil, err
 	}
 	app.TemplateCache = tc
 	app.UseCache = false
 	app.Session = session
 
+	// connect to database
+	log.Println("Connecting to database...")
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=pablo password=password")
+	if err != nil {
+		log.Fatal("cannot connecting to database...dying...", err)
+	}
+	log.Println("Connected to database!")
+
 	render.NewTemplate(&app)
 
-	repo := handler.NewRepo(&app)
+	repo := handler.NewRepo(&app, db)
 
 	helpers.NewHelpers(&app)
 
 	handler.NewHandler(repo)
 
-	return nil
+	return db, nil
 }

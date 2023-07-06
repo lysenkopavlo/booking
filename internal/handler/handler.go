@@ -10,10 +10,13 @@ import (
 	"net/http"
 
 	"github.com/lysenkopavlo/booking/internal/config"
+	"github.com/lysenkopavlo/booking/internal/driver"
 	"github.com/lysenkopavlo/booking/internal/forms"
 	"github.com/lysenkopavlo/booking/internal/helpers"
 	"github.com/lysenkopavlo/booking/internal/models"
 	"github.com/lysenkopavlo/booking/internal/render"
+	"github.com/lysenkopavlo/booking/internal/repository"
+	"github.com/lysenkopavlo/booking/internal/repository/dbrepo"
 )
 
 // Repo the repository used by handlers
@@ -22,12 +25,14 @@ var Repo *Repository
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DataBaseRepo
 }
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
@@ -81,10 +86,10 @@ func (rp *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PostReservation handels the posting of a reservation form
+// PostReservation handles the posting of a reservation form
 func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
-	//err = errors.New("something happend!")
+	//err = errors.New("something happened!")
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -114,7 +119,7 @@ func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Putting user's values into contex
+	// Putting user's values into context
 	rp.App.Session.Put(r.Context(), "reservation", reservation)
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }
@@ -147,7 +152,7 @@ func (rp *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PostAvalability
+// PostAvailability
 func (rp *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
@@ -165,7 +170,7 @@ type jsonResponse struct {
 	Message string `json:"message"`
 }
 
-// AvalabilityJSON
+// AvailabilityJSON
 func (rp *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 	res := jsonResponse{
 		OK:      true,

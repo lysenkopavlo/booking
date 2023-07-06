@@ -15,7 +15,6 @@ type DB struct {
 	SQL *sql.DB
 }
 
-// Variable to
 var dbConn = &DB{}
 
 // Declaring some connection pool properties
