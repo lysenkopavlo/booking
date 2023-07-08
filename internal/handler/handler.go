@@ -111,6 +111,7 @@ func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	endDate, err := time.Parse(layout, ed)
 	if err != nil {
 		helpers.ServerError(w, err)
+		return
 	}
 
 	// Getting a room_id in string format
@@ -120,6 +121,7 @@ func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	roomID, err := strconv.Atoi(rID)
 	if err != nil {
 		helpers.ServerError(w, err)
+		return
 	}
 
 	reservation := models.Reservation{
@@ -149,9 +151,25 @@ func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = rp.DB.InsertReservation(reservation)
+	newReservationID, err := rp.DB.InsertReservation(reservation)
 	if err != nil {
 		helpers.ServerError(w, err)
+		return
+	}
+
+	// building a model for room_restriction table
+	restriction := models.RoomRestriction{
+		StartDate:     startDate,
+		EndDate:       endDate,
+		RoomID:        roomID,
+		ReservationID: newReservationID,
+		RestrictionId: 1,
+	}
+
+	err = rp.DB.InsertRoomRestriction(restriction)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
 	}
 
 	// Putting user's values into context
