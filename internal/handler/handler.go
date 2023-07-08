@@ -115,6 +115,7 @@ func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 
 	// Getting a room_id in string format
 	rID := r.Form.Get("room_id")
+
 	// Converting roomID into integer to populate reservation form
 	roomID, err := strconv.Atoi(rID)
 	if err != nil {
