@@ -14,4 +14,6 @@ type DataBaseRepo interface {
 	InsertRoomRestriction(res models.RoomRestriction) error
 
 	SearchAvailabilityByDatesAndRoomID(startDate, endDate time.Time, roomID int) (bool, error)
+
+	SearchAvailabilityForAllRooms(startDate, endDate time.Time) ([]models.Room, error)
 }

@@ -107,7 +107,7 @@ CREATE TABLE public.room_restrictions (
     start_date date NOT NULL,
     end_date date NOT NULL,
     room_id integer NOT NULL,
-    reservation_id integer NOT NULL,
+    reservation_id integer,
     restriction_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -388,6 +388,13 @@ ALTER TABLE ONLY public.room_restrictions
 
 ALTER TABLE ONLY public.room_restrictions
     ADD CONSTRAINT room_restrictions_rooms_id_fk FOREIGN KEY (room_id) REFERENCES public.rooms(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: TABLE reservations; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.reservations TO pablo;
 
 
 --
