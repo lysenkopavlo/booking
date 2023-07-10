@@ -1,6 +1,10 @@
 package repository
 
-import "github.com/lysenkopavlo/booking/internal/models"
+import (
+	"time"
+
+	"github.com/lysenkopavlo/booking/internal/models"
+)
 
 type DataBaseRepo interface {
 	AllUsers() bool
@@ -8,4 +12,6 @@ type DataBaseRepo interface {
 	InsertReservation(res models.Reservation) (int, error)
 
 	InsertRoomRestriction(res models.RoomRestriction) error
+
+	SearchAvailabilityByDatesAndRoomID(startDate, endDate time.Time, roomID int) (bool, error)
 }
