@@ -80,7 +80,7 @@ func (m *postgresDbRepo) SearchAvailabilityByDatesAndRoomID(startDate, endDate t
 	defer cancel()
 
 	// numRow holds the number of row
-	//which crosses with startDate and endDate
+	// which crosses with startDate and endDate
 	var numRow int
 
 	//query holds SQL-query

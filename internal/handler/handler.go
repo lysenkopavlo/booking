@@ -5,7 +5,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -205,16 +204,51 @@ func (rp *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PostAvailability
+// PostAvailability renders the search-availability page
 func (rp *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 
-	_, err := w.Write([]byte(fmt.Sprintf("Your starting date is: %s and your ending date is: %s", start, end)))
+	layout := "2006-01-02"
+
+	startDate, err := time.Parse(layout, start)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+	endDate, err := time.Parse(layout, end)
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
 	}
+
+	// Looking for available rooms
+	rooms, err := rp.DB.SearchAvailabilityForAllRooms(startDate, endDate)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	if len(rooms) == 0 {
+		// it means there is no free rooms
+		// I want to show an error message
+		rp.App.Session.Put(r.Context(), "error", "There is NO AVAILABLE ROOMS!")
+		http.Redirect(w, r, "/search-availability", http.StatusSeeOther)
+		return
+	}
+
+	// if there are available rooms
+	// we render new page with this rooms
+
+	data := make(map[string]interface{})
+	err = render.Template(w, r, "choose-room.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
+
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
 }
 
 // jsonResponse
