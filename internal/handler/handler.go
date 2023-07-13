@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/lysenkopavlo/booking/internal/config"
 	"github.com/lysenkopavlo/booking/internal/driver"
 	"github.com/lysenkopavlo/booking/internal/forms"
@@ -311,4 +312,25 @@ func (rp *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request)
 		helpers.ServerError(w, err)
 		return
 	}
+}
+
+func (rp *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
+	// Getting room_id from url /choose-room/{id}
+	// to put it into reservation
+	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	// getting values reservation from session
+	// to update its roomID field with new value
+	res, ok := rp.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		helpers.ServerError(w, err)
+		return
+	}
+	res.RoomID = roomID
+	rp.App.Session.Put(r.Context(), "reservation", res)
+	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 }

@@ -4,13 +4,14 @@
 <div class="container">
     <div class="row">
         <div class="col">
-            <h1 class="text-center me-3">Choose a room, son!<h1>
+            <h1>Choose a room, son!<h1>
 
             {{$rooms := index .Data "rooms"}}
-
+            <ul>
             {{range $rooms}}
-                {{.RoomName}}<br>       
+                <li><a href="/choose-room/{{.ID}}">{{.RoomName}}</a></li>      
             {{end}}
+            </ul>
         </div>
     </div>
 </div>
