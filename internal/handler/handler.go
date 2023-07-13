@@ -5,6 +5,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -74,13 +75,36 @@ func (rp *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 // Reservation renders the make reservation page and displays a form
 func (rp *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	var emptyReservation models.Reservation
-	data := make(map[string]interface{})
-	data["reservation"] = emptyReservation
 
-	err := render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
-		Form: forms.New(nil),
-		Data: data,
+	res, ok := rp.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		helpers.ServerError(w, errors.New("cannot get reservation from session"))
+		return
+	}
+
+	room, err := rp.DB.GetRoomByID(res.RoomID)
+	if err != nil {
+		helpers.ServerError(w, errors.New("cannot get a room name by its id!"))
+		return
+	}
+
+	res.Room.RoomName = room.RoomName
+
+	sd := res.StartDate.Format("2006-01-02")
+	ed := res.EndDate.Format("2006-01-02")
+
+	stringMap := make(map[string]string)
+	stringMap["start_date"] = sd
+	stringMap["end_date"] = ed
+	//stringMap["room_name"] = room.RoomName
+
+	data := make(map[string]interface{})
+	data["reservation"] = res
+
+	err = render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+		Form:      forms.New(nil),
+		Data:      data,
+		StringMap: stringMap,
 	})
 	if err != nil {
 		helpers.ServerError(w, err)
@@ -327,7 +351,7 @@ func (rp *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	// to update its roomID field with new value
 	res, ok := rp.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		helpers.ServerError(w, err)
+		helpers.ServerError(w, errors.New("cannot get a reservation values from session"))
 		return
 	}
 	res.RoomID = roomID

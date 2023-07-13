@@ -1,3 +1,5 @@
+// Package dbrepo holds postgres queries
+
 package dbrepo
 
 import (
@@ -150,4 +152,31 @@ func (m *postgresDbRepo) SearchAvailabilityForAllRooms(startDate, endDate time.T
 	}
 
 	return rooms, nil
+}
+
+// GetRoomByID gets the room by its id
+func (m *postgresDbRepo) GetRoomByID(roomID int) (models.Room, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var r models.Room
+	query := `
+			SELECT 
+				id, room_name, created_at, updated_at
+			FROM 
+				rooms
+			WHERE
+				id = $1	
+
+	`
+	row := m.DB.QueryRowContext(ctx, query, roomID)
+	err := row.Scan(
+		&r.ID,
+		&r.RoomName,
+		&r.CreatedAt,
+		&r.UpdatedAt,
+	)
+	if err != nil {
+		return r, err
+	}
+	return r, nil
 }
