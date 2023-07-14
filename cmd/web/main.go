@@ -42,8 +42,11 @@ func main() {
 	err = srv.ListenAndServe()
 	log.Fatal(err)
 }
+
+// It's moved for testing reasons
 func run() (*driver.DB, error) {
-	// what I'm going to put in the session
+
+	// what I'm going to put into the session
 	gob.Register(models.Reservation{})
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
