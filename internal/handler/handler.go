@@ -1,4 +1,4 @@
-// Package "handler" is used to handle http requests and responses
+// Package handler is used to handle http requests and responses
 // Also here I'm using a "repository pattern"
 
 package handler
@@ -262,17 +262,20 @@ func (rp *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// jsonResponse
+// jsonResponse is a struct to write a response
 type jsonResponse struct {
-	OK      bool   `json:"ok"`
-	Message string `json:"message"`
+	OK        bool   `json:"ok"`
+	Message   string `json:"message"`
+	RoomID    string `json:"room_id"`
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
 }
 
-// AvailabilityJSON
+// AvailabilityJSON handles request for availability and send JSON response
 func (rp *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
-	sd := r.Form.Get("start_date")
-	ed := r.Form.Get("end_date")
+	sd := r.Form.Get("start")
+	ed := r.Form.Get("end")
 	roomId, err := strconv.Atoi(r.Form.Get("room_id"))
 	if err != nil {
 		helpers.ServerError(w, errors.New("cannot get room_id from room-availability"))
@@ -297,18 +300,22 @@ func (rp *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := jsonResponse{
-		OK:      isAvailable,
-		Message: "",
+	resp := jsonResponse{
+		OK:        isAvailable,
+		Message:   "",
+		StartDate: sd,
+		EndDate:   ed,
+		RoomID:    strconv.Itoa(roomId),
 	}
 
-	out, err := json.MarshalIndent(res, "", "    ")
+	out, err := json.MarshalIndent(resp, "", "    ")
 	if err != nil {
-		helpers.ServerError(w, err)
+		helpers.ServerError(w, errors.New("cannot marshal response into json file"))
 		return
 	}
 	log.Println(string(out))
-	w.Header().Set("Content-type", "application/json")
+
+	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(out)
 	if err != nil {
 		helpers.ServerError(w, err)
@@ -325,6 +332,7 @@ func (rp *Repository) Contacts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ReservationSummary displays the reservation-summary page
 func (rp *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := rp.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
@@ -354,6 +362,7 @@ func (rp *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// ChooseRoom displays list of available rooms
 func (rp *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	// Getting room_id from url /choose-room/{id}
 	// to put it into reservation
@@ -371,6 +380,49 @@ func (rp *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res.RoomID = roomID
+	rp.App.Session.Put(r.Context(), "reservation", res)
+	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
+}
+
+// BookRoom takes URL parameters, builds a sessional variable, and takes user to make res screen
+func (rp *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
+
+	// Getting room_id from url /book-room
+	// because it's in the URL itself
+	// then we put it into reservation
+	roomID, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	sd := r.URL.Query().Get("s")
+	ed := r.URL.Query().Get("e")
+	log.Println(roomID, sd, ed)
+
+	layout := "2006-01-02"
+	startDate, err := time.Parse(layout, sd)
+	if err != nil {
+		helpers.ServerError(w, errors.New("cannot parsing the star_date"))
+	}
+	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		helpers.ServerError(w, errors.New("cannot parsing the end_date"))
+	}
+
+	var res models.Reservation
+	res.RoomID = roomID
+	res.StartDate = startDate
+	res.EndDate = endDate
+
+	//Getting RoomName by its id
+	room, err := rp.DB.GetRoomByID(res.RoomID)
+	if err != nil {
+		helpers.ServerError(w, errors.New("cannot get a room name by its id!"))
+		return
+	}
+
+	res.Room.RoomName = room.RoomName
+
 	rp.App.Session.Put(r.Context(), "reservation", res)
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 }
