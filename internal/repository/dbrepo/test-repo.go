@@ -3,6 +3,7 @@
 package dbrepo
 
 import (
+	"errors"
 	"time"
 
 	"github.com/lysenkopavlo/booking/internal/models"
@@ -14,12 +15,19 @@ func (m *testDbRepo) AllUsers() bool {
 
 // InsertReservation inserts a reservation into database
 func (m *testDbRepo) InsertReservation(res models.Reservation) (int, error) {
-	return -1, nil
+	if res.RoomID == 2 {
+		return -1, errors.New("wrong RoomID")
+	}
+	return 0, nil
 }
 
 // InsertRoomRestriction inserts a room_restriction into the database
 func (m *testDbRepo) InsertRoomRestriction(res models.RoomRestriction) error {
+	if res.RoomID == 1000 {
+		return errors.New("wrong RoomID")
+	}
 	return nil
+
 }
 
 // SearchAvailabilityByDatesAndRoomID search available rooms by specific dates and room_id
@@ -44,6 +52,9 @@ func (m *testDbRepo) SearchAvailabilityForAllRooms(startDate, endDate time.Time)
 // GetRoomByID gets the room by its id
 func (m *testDbRepo) GetRoomByID(roomID int) (models.Room, error) {
 	var r models.Room
+	if roomID < 1 || roomID > 2 {
+		return r, errors.New("wrong ID")
+	}
 
 	return r, nil
 }
