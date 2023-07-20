@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"context"
@@ -114,12 +114,13 @@ func TestRepository_Reservation(t *testing.T) {
 
 	// Simmulating request-response cycle down here
 	rr = httptest.NewRecorder()
+	handler = http.HandlerFunc(Repo.Reservation)
 	handler.ServeHTTP(rr, req)
 
 	// But we don't put a reservation variable into context
 	// coz we are testing redirection
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("\nerror while testing sesseion withou reservation\nReservation handler returned wrong response code\nGot: %d\twanted: %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("\nerror while testing session without reservation\nReservation handler returned wrong response code\nGot: %d\twanted: %d", rr.Code, http.StatusTemporaryRedirect)
 	}
 
 	// Test case whean roomID is wrong
@@ -132,14 +133,15 @@ func TestRepository_Reservation(t *testing.T) {
 
 	// Simmulating request-response cycle down here
 	rr = httptest.NewRecorder()
-	// But this time we put into context updated reservation variable with defenatly wron roomID
+	// But this time we put into context updated reservation variable with defenatly invalid roomID
 	reservation.RoomID = 100
 	session.Put(ctx, "reservation", reservation)
 
+	handler = http.HandlerFunc(Repo.Reservation)
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("\nerror while testing wrong roomID\nReservation handler returned wrong response code\nGot: %d\twanted: %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("\nerror while testing wrong roomID\nReservation handler returned wrong response code\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
 	}
 
 }
@@ -179,7 +181,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("\nPostReservation handler didn't parse star_date\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
+		t.Errorf("\nPostReservation handler didn't parse anything\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test for invalid start_date
@@ -203,7 +205,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("\nPostReservation handler didn't parse star_date\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
+		t.Errorf("\nPostReservation handler didn't parse start_date\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test for invalid end_date
@@ -328,6 +330,77 @@ func TestRepository_PostReservation(t *testing.T) {
 
 }
 
+func TestRepository_PostAvailability(t *testing.T) {
+	reqBody := "start=2050-01-02"
+	reqBody = fmt.Sprintf("%s&%s", reqBody, "end=2050-01-03")
+
+	req, _ := http.NewRequest("POST", "/search-availability", strings.NewReader(reqBody))
+	ctx := getCTX(req)
+	req = req.WithContext(ctx)
+
+	req.Header.Set("Content-Type", "application/x-www-urlencoded")
+	rr := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(Repo.PostAvailability)
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("\nPostAvailability handler returned a wrong response code\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
+	}
+
+	// without body ins session
+	req, _ = http.NewRequest("POST", "/search-availability", nil)
+	ctx = getCTX(req)
+	req = req.WithContext(ctx)
+
+	req.Header.Set("Content-Type", "application/x-www-urlencoded")
+	rr = httptest.NewRecorder()
+
+	handler = http.HandlerFunc(Repo.PostAvailability)
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("\nPostAvailability handler returned a wrong response code\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
+	}
+
+	// invalid start_date
+	reqBody = "start=invalid"
+	reqBody = fmt.Sprintf("%s&%s", reqBody, "end=2050-01-03")
+
+	req, _ = http.NewRequest("POST", "/search-availability", strings.NewReader(reqBody))
+	ctx = getCTX(req)
+	req = req.WithContext(ctx)
+
+	req.Header.Set("Content-Type", "application/x-www-urlencoded")
+	rr = httptest.NewRecorder()
+
+	handler = http.HandlerFunc(Repo.PostAvailability)
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("\nPostAvailability handler cannot parse a start_date\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
+	}
+
+	// invalid start_date
+	reqBody = "start=2050-01-02"
+	reqBody = fmt.Sprintf("%s&%s", reqBody, "end=invalid")
+
+	req, _ = http.NewRequest("POST", "/search-availability", strings.NewReader(reqBody))
+	ctx = getCTX(req)
+	req = req.WithContext(ctx)
+
+	req.Header.Set("Content-Type", "application/x-www-urlencoded")
+	rr = httptest.NewRecorder()
+
+	handler = http.HandlerFunc(Repo.PostAvailability)
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("\nPostAvailability handler cannot parse a end_date\nGot: %d\twanted: %d", rr.Code, http.StatusSeeOther)
+	}
+
+}
+
 // getCTX returns contex for TestRepository_Reservation purposes
 func getCTX(r *http.Request) context.Context {
 	ctx, err := session.Load(r.Context(), r.Header.Get("X-Session")) // It's neccessary to write "X-Session" coz of testing
@@ -336,3 +409,8 @@ func getCTX(r *http.Request) context.Context {
 	}
 	return ctx
 }
+
+//	to display test coverage in more details
+//	use this command:
+//	go test -coverprofile=coverage.out && go tool cover -html=coverage.out
+// 	if HTML doesn't open use `-func` flag

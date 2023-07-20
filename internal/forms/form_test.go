@@ -118,5 +118,8 @@ func TestForm_Has(t *testing.T) {
 	if !tF.Has("a") {
 		t.Error("It should has a field, but it doesn't.")
 	}
-
 }
+
+//	to display test coverage in more details
+//	use this command:
+//	go test -coverprofile=coverage.out && go tool cover -html=coverage.out

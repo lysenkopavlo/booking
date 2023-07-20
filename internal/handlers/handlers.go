@@ -1,7 +1,7 @@
-// Package handler is used to handle http requests and responses
+// Package handlers is used to handle http requests and responses
 // Also here I'm using a "repository pattern"
 
-package handler
+package handlers
 
 import (
 	"encoding/json"
@@ -87,16 +87,16 @@ func (rp *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	// Pull out reservation data from session
 	res, ok := rp.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		rp.App.Session.Put(r.Context(), "error", errors.New("cannot get reservation from session"))
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		rp.App.Session.Put(r.Context(), "error", "cannot get reservation from session")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	//Getting RoomName by its id
 	room, err := rp.DB.GetRoomByID(res.RoomID)
 	if err != nil {
-		rp.App.Session.Put(r.Context(), "error", errors.New("cannot find a room"))
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		rp.App.Session.Put(r.Context(), "error", "cannot find a room")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 
 	}
@@ -112,7 +112,6 @@ func (rp *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["start_date"] = sd
 	stringMap["end_date"] = ed
-	//stringMap["room_name"] = room.RoomName
 
 	data := make(map[string]interface{})
 	data["reservation"] = res
@@ -133,7 +132,7 @@ func (rp *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
-		rp.App.Session.Put(r.Context(), "error", errors.New("cannot parse the form"))
+		rp.App.Session.Put(r.Context(), "error", "cannot parse the form")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -265,6 +264,12 @@ func (rp *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 
 // PostAvailability renders the search-availability page
 func (rp *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		rp.App.Session.Put(r.Context(), "error", "can't parse form!")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 
@@ -272,18 +277,22 @@ func (rp *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 
 	startDate, err := time.Parse(layout, start)
 	if err != nil {
-		helpers.ServerError(w, err)
+		rp.App.Session.Put(r.Context(), "error", "cannot parse start_date")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
 	}
 	endDate, err := time.Parse(layout, end)
 	if err != nil {
-		helpers.ServerError(w, err)
+		rp.App.Session.Put(r.Context(), "error", "cannot parse end_date")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	// Looking for available rooms
 	rooms, err := rp.DB.SearchAvailabilityForAllRooms(startDate, endDate)
 	if err != nil {
-		helpers.ServerError(w, err)
+		rp.App.Session.Put(r.Context(), "error", "cannot render a page")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -311,7 +320,8 @@ func (rp *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		helpers.ServerError(w, err)
+		rp.App.Session.Put(r.Context(), "error", "cannot render choose-room page!")
+		http.Redirect(w, r, "/search-availability", http.StatusSeeOther)
 		return
 	}
 

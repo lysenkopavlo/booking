@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"encoding/gob"
@@ -151,3 +151,7 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 	}
 	return myCache, nil
 }
+
+//	to display test coverage in more details
+//	use this command:
+//	go test -coverprofile=coverage.out && go tool cover -html=coverage.out

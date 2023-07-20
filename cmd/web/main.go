@@ -11,7 +11,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/lysenkopavlo/booking/internal/config"
 	"github.com/lysenkopavlo/booking/internal/driver"
-	"github.com/lysenkopavlo/booking/internal/handler"
+	"github.com/lysenkopavlo/booking/internal/handlers"
 	"github.com/lysenkopavlo/booking/internal/helpers"
 	"github.com/lysenkopavlo/booking/internal/models"
 	"github.com/lysenkopavlo/booking/internal/render"
@@ -95,11 +95,11 @@ func run() (*driver.DB, error) {
 
 	render.NewRenderer(&app)
 
-	repo := handler.NewRepo(&app, db)
+	repo := handlers.NewRepo(&app, db)
 
 	helpers.NewHelpers(&app)
 
-	handler.NewHandler(repo)
+	handlers.NewHandler(repo)
 
 	return db, nil
 }

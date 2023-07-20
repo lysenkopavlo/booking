@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/lysenkopavlo/booking/internal/config"
-	"github.com/lysenkopavlo/booking/internal/handler"
+	"github.com/lysenkopavlo/booking/internal/handlers"
 )
 
 func routes(app *config.AppConfig) http.Handler {
@@ -21,23 +21,23 @@ func routes(app *config.AppConfig) http.Handler {
 
 	mux.Use(SessionLoad)
 
-	mux.Get("/", handler.Repo.Home)
-	mux.Get("/about", handler.Repo.About)
-	mux.Get("/generals-quarters", handler.Repo.Generals)
-	mux.Get("/majors-suite", handler.Repo.Majors)
+	mux.Get("/", handlers.Repo.Home)
+	mux.Get("/about", handlers.Repo.About)
+	mux.Get("/generals-quarters", handlers.Repo.Generals)
+	mux.Get("/majors-suite", handlers.Repo.Majors)
 
-	mux.Get("/search-availability", handler.Repo.Availability)
-	mux.Post("/search-availability", handler.Repo.PostAvailability)
-	mux.Post("/search-availability-json", handler.Repo.AvailabilityJSON)
+	mux.Get("/search-availability", handlers.Repo.Availability)
+	mux.Post("/search-availability", handlers.Repo.PostAvailability)
+	mux.Post("/search-availability-json", handlers.Repo.AvailabilityJSON)
 
-	mux.Get("/choose-room/{id}", handler.Repo.ChooseRoom)
-	mux.Get("/book-room", handler.Repo.BookRoom)
+	mux.Get("/choose-room/{id}", handlers.Repo.ChooseRoom)
+	mux.Get("/book-room", handlers.Repo.BookRoom)
 
-	mux.Get("/contacts", handler.Repo.Contacts)
+	mux.Get("/contacts", handlers.Repo.Contacts)
 
-	mux.Get("/make-reservation", handler.Repo.Reservation)
-	mux.Post("/make-reservation", handler.Repo.PostReservation)
-	mux.Get("/reservation-summary", handler.Repo.ReservationSummary)
+	mux.Get("/make-reservation", handlers.Repo.Reservation)
+	mux.Post("/make-reservation", handlers.Repo.PostReservation)
+	mux.Get("/reservation-summary", handlers.Repo.ReservationSummary)
 
 	// Telling to app where are the files
 	fileServer := http.FileServer(http.Dir("./static/"))
